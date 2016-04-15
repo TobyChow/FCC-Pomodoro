@@ -18,17 +18,35 @@
 <body>
     <!-- CODE BELOW -->
     <div class="container">
+        <span class="title">Pomodoro Clock</span>
+        <div class="start-time">
+            <div class="start-work-time">
+                <p>Work Session</p>
+                <div class="work-session">
+                    <span id="add-work-min" class="glyphicon glyphicon-arrow-up"></span>
+                    <span class="start-work-display"></span>
+                    <span id="minus-work-min" class="glyphicon glyphicon-arrow-down"></span>
+                </div>
+            </div>
+            <div class="start-break-time">
+                <p>Break Session</p>
+                <div class="start-break">
+                    <span id="add-break-min" class="glyphicon glyphicon-arrow-up"></span>
+                    <span class="start-break-display"></span>
+                    <span id="minus-break-min" class="glyphicon glyphicon-arrow-down"></span>
+                </div>
+            </div>
+        </div>
         <div class="timer">
-            Work Timer
-            <br> Minutes:
-            <span id="work-minutes-display"></span>
-            <br> Seconds:
-            <span id="work-seconds-display"></span>
-            <hr> Break timer
-            <br> Minutes:
-            <span id="break-minutes-display"></span>
-            <br> Seconds:
-            <span id="break-seconds-display"></span>
+            <p id="status">Work Time!</p>
+            <span id="work-minutes-display"></span>:<span id="work-seconds-display"></span>
+            <hr>
+            <div class="buttons">
+                <button id="start" type="button" class="btn btn-info">Start</button>
+                <button id="pause" type="button" class="btn btn-info">Pause</button>
+                <br>
+                <button id="reset" type="button" class="btn btn-info">Reset</button>
+            </div>
         </div>
     </div>
     <!-- CODE ABOVE -->

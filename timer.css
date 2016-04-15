@@ -1,3 +1,43 @@
-.timer {
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+}
+
+.container {
+    position: relative;
+    height: 99vh;
     font-family: 'Orbitron', sans-serif;
+    font-size: 3em;
+    color: #18CAE6;
+    text-align: center;
+}
+
+.timer {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    top: 5em;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.start-work-time {
+    float: left;
+}
+
+.start-break-time {
+    float: right;
+}
+
+button {
+    width: 6em;
+}
+
+.start-time {
+    margin-top: 0.5em;
 }
