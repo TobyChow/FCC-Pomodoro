@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    position: relative;
+    padding-top: 1em;
     height: 99vh;
     font-family: 'Orbitron', sans-serif;
     font-size: 3em;
@@ -40,4 +40,21 @@ button {
 
 .start-time {
     margin-top: 0.5em;
+}
+
+input {
+    background-color: black;
+    border: 1px solid #18CAE6;
+    width: 2em;
+    z-index: -10;
+    text-align: center;
+}
+
+
+/*Removes arrows from input type=number*/
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
