@@ -191,18 +191,23 @@ $(document).ready(function() {
 
     // ALLOW USERS TO MANUALLY INPUT SESSION LENGTHS
 
-    $("input").keyup(function() {
-        var inputType = $(this).attr('class');
-        if (inputType == 'start-work-display') {
-            startWorkMinute = $(this).val();
-            display();
-            console.log('a');
+    $("input").on("keyup", function(evt) {
+        var inputLen = $(this).val().length;
+        console.log(inputLen);
+        if (isNum(evt)) {
+            if (inputLen <= 2) {
+                var inputType = $(this).attr('class');
+                if (inputType == 'start-work-display') {
+                    startWorkMinute = $(this).val();
+                    display();
+                } else {
+                    startBreakMinute = $(this).val();
+                    display();
+                }
+            }
         } else {
-            startBreakMinute = $(this).val();
-            display();
-            console.log('b');
+            console.log("Enter A Number");
         }
-        console.log($("input").val().length);
     });
 
     // CHECK IF INPUT IS A NUMBER FROM 0-9, evt = event
@@ -210,10 +215,7 @@ $(document).ready(function() {
     function isNum(evt) {
         var charCode = evt.which;
         // ASCII Values (DEC) for 0-9
-        console.log(charCode >= 48 && charCode <= 57);
-
+        return (charCode >= 48 && charCode <= 57);
     }
-
-
 
 });
