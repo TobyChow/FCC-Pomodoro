@@ -1,20 +1,49 @@
 //FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET, 
 //TODO: PREVENT INPUTS <1, ONLY ALLOW NUMERICAL INPUTS, SCROLLING START NUMBERS RESULT IN INCORRECT TIME DISPLAY, ALLOW USERS TO SET ALARM LENGTH
+//NOTES: Need to place input check outside of document.ready, or Init script won't be ran on HTML load
+
+// Initial work minutes / seconds
+
+var startWorkMinute = 0;
+var startWorkSeconds = 0;
+
+// Initial break minutes / seconds
+
+var startBreakMinute = 0;
+var startBreakSeconds = 0;
+
+// PAUSE
+var isPaused = true;
+
+// STORE ALARM DOM
+
+var alarm = $('#alarm')[0];
+
+// PREVENT NON-NUMERIC INPUTS, DOES A CHECK BEFORE INPUT IS CONFIRMED
+
+function Init() {
+    $(".start-work-display").keydown(function(evt) {
+        console.log('init');
+        checkName(evt);
+    });
+}
+
+function checkName(evt) {
+    var charCode = evt.which;
+    if (charCode !== 0) {
+        // Allows 0-9 and backspace
+        if ((charCode < 48 || charCode > 57) && charCode !== 8) {
+            evt.preventDefault();
+            console.log(
+                "Please use lowercase letters only." + "\n" + "charCode: " + charCode + "\n"
+            );
+        } else {
+            startWorkMinute = $(".start-work-display").val();
+        }
+    }
+}
 
 $(document).ready(function() {
-
-    // Initial work minutes / seconds
-
-    var startWorkMinute = 25;
-    var startWorkSeconds = 4;
-
-    // Initial break minutes / seconds
-
-    var startBreakMinute = 0;
-    var startBreakSeconds = 4;
-
-    // PAUSE
-    var isPaused = true;
 
     // STORE ALARM DOM
 
@@ -67,11 +96,13 @@ $(document).ready(function() {
     bindClick();
 
     // REMOVES ADD/MINUS FUNCTIONS (ARROWS DONT WORK)
+
     function unbindClick() {
         $(".start-time").find('span').off();
     }
 
     // START / PAUSE FUNCTIONS, PAUSECOUNT TO PREVENT BINDING CLICK FUNCTION MORE THAN ONCE (0 = PAUSED, 1 = UNPAUSED)
+
     var pauseCount = 1;
     $('#pause').click(
         function() {
@@ -83,8 +114,15 @@ $(document).ready(function() {
             }
         });
 
+    // TRACK IF TIMER IS CURRENTLY RUNNING A SESSION
+    var timing = false;
+
     $('#start').click(
         function() {
+            if (timing === false) {
+                var workTimer = setInterval(timer, 1000);
+                timing = true;
+            }
             isPaused = false;
             unbindClick();
             // Will always allow bind click on reset or pause click
@@ -102,6 +140,7 @@ $(document).ready(function() {
         startBreakMinute = 5;
         startBreakSeconds = 0;
         isPaused = true;
+        timing = false;
         //Prevents multiple bind clicks (fix reset->pause, multiple binds)
         if (pauseCount > 1) {
             bindClick();
@@ -140,7 +179,6 @@ $(document).ready(function() {
     //COUNTDOWN TIMER FUNCTION
 
     function timer() {
-
         if (!isPaused) {
             if (startWorkSeconds - 1 >= 0) {
                 if (startWorkSeconds - 1 <= 9) {
@@ -187,35 +225,21 @@ $(document).ready(function() {
         }
     }
 
-    var workTimer = setInterval(timer, 1000);
+
 
     // ALLOW USERS TO MANUALLY INPUT SESSION LENGTHS
 
-    $("input").on("keyup", function(evt) {
+    $("input").on("input", function(evt) {
         var inputLen = $(this).val().length;
         console.log(inputLen);
-        if (isNum(evt)) {
-            if (inputLen <= 2) {
-                var inputType = $(this).attr('class');
-                if (inputType == 'start-work-display') {
-                    startWorkMinute = $(this).val();
-                    display();
-                } else {
-                    startBreakMinute = $(this).val();
-                    display();
-                }
-            }
+        var inputType = $(this).attr('class');
+        if (inputType == 'start-work-display') {
+            startWorkMinute = $(this).val();
+            display();
         } else {
-            console.log("Enter A Number");
+            startBreakMinute = $(this).val();
+            display();
         }
     });
-
-    // CHECK IF INPUT IS A NUMBER FROM 0-9, evt = event
-
-    function isNum(evt) {
-        var charCode = evt.which;
-        // ASCII Values (DEC) for 0-9
-        return (charCode >= 48 && charCode <= 57);
-    }
 
 });

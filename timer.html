@@ -15,7 +15,7 @@
     <link href='https://fonts.googleapis.com/css?family=Orbitron:500' rel='stylesheet' type='text/css'>
 </head>
 
-<body>
+<body onload="Init ()">
     <!-- CODE BELOW -->
     <div class="container">
         <span class="title">Pomodoro Clock</span>
@@ -24,7 +24,7 @@
                 <p>Work Session</p>
                 <div class="work-session">
                     <span id="add-work-min" class="glyphicon glyphicon-arrow-up"></span>
-                    <input type="number" maxlength="2" class="start-work-display" autofocus="true"></input>
+                    <input type="text" maxlength="2" class="start-work-display" autofocus="true"></input>
                     <span id="minus-work-min" class="glyphicon glyphicon-arrow-down"></span>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                 <br>
                 <button id="reset" type="button" class="btn btn-info">Reset</button>
                 <br>
-                <audio id="alarm" src="alarm.mp3" volume="0.5" loop="true" controls></audio>
+                <audio id="alarm" src="alarm.mp3" volume="0.7" loop="true" controls></audio>
             </div>
         </div>
     </div>
