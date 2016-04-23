@@ -1,53 +1,77 @@
-//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET, 
+//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET
+
 //TODO: PREVENT INPUTS <1, ONLY ALLOW NUMERICAL INPUTS, SCROLLING START NUMBERS RESULT IN INCORRECT TIME DISPLAY, ALLOW USERS TO SET ALARM LENGTH
-//NOTES: Need to place input check outside of document.ready, or Init script won't be ran on HTML load
-
-// Initial work minutes / seconds
-
-var startWorkMinute = 0;
-var startWorkSeconds = 0;
-
-// Initial break minutes / seconds
-
-var startBreakMinute = 0;
-var startBreakSeconds = 0;
-
-// PAUSE
-var isPaused = true;
-
-// STORE ALARM DOM
-
-var alarm = $('#alarm')[0];
-
-// PREVENT NON-NUMERIC INPUTS, DOES A CHECK BEFORE INPUT IS CONFIRMED
-
-function Init() {
-    $(".start-work-display").keydown(function(evt) {
-        console.log('init');
-        checkName(evt);
-    });
-}
-
-function checkName(evt) {
-    var charCode = evt.which;
-    if (charCode !== 0) {
-        // Allows 0-9 and backspace
-        if ((charCode < 48 || charCode > 57) && charCode !== 8) {
-            evt.preventDefault();
-            console.log(
-                "Please use lowercase letters only." + "\n" + "charCode: " + charCode + "\n"
-            );
-        } else {
-            startWorkMinute = $(".start-work-display").val();
-        }
-    }
-}
+//(NEED TO FIX <1MIN INTERACTIONS WITH MOUSECLICKS / BUG IF SINGLE NON ZERO NUM + (VERY QUICKLY PRESS BACKSP AND ZERO) / 
+//IMPLEMENT FEATURES TO BREAK DISPLAY 
 
 $(document).ready(function() {
+
+    Init();
+
+    // Initial work minutes / seconds
+
+    var startWorkMinute;
+    var startWorkSeconds = 0;
+
+    // Initial break minutes / seconds
+
+    var startBreakMinute = 0;
+    var startBreakSeconds = 0;
+
+    // PAUSE
+    var isPaused = true;
 
     // STORE ALARM DOM
 
     var alarm = $('#alarm')[0];
+
+    var allowedCodes = /^4[9]|^5[0-7]|^8/g;
+
+    var inputLen;
+
+    // RETURN NUMBER OF DIGITS IN DISPLAY TO DISABLE 0 AS THE ONLY INPUT
+
+    function checkDigit() {
+        afterInputLength();
+        // Prevents 0 is display is empty 
+        if (inputLen === 0 || inputLen === undefined) {
+            allowedCodes = /^4[9]|^5[0-7]|^8/g;
+        } else {
+            allowedCodes = /^4[8-9]|^5[0-7]|^8/g;
+        }
+    }
+
+    // PREVENT NON-NUMERIC INPUTS, DOES A CHECK BEFORE INPUT IS CONFIRMED
+
+    function Init() {
+        $("input").keydown(function(evt) {
+            checkDigit();
+            isNum(evt);
+        });
+    }
+
+    function afterInputLength() {
+        $("input").keyup(function() {
+            inputLen = ($(this).val().length);
+            console.log(inputLen);
+        });
+    }
+
+
+    function isNum(evt) {
+        var charCode = evt.which;
+        if (charCode !== 0) {
+            // Allows 0-9 and backspace
+            if (charCode.toString().match(allowedCodes) === null) {
+                evt.preventDefault();
+                console.log(
+                    "Please use lowercase letters only." + "\n" + "charCode: " + charCode + "\n"
+                );
+            } else {
+                startWorkMinute = $(".start-work-display").val();
+            }
+        }
+    }
 
     // PLAY ALARM AUDIO FUNCTION
 
@@ -225,13 +249,9 @@ $(document).ready(function() {
         }
     }
 
-
-
     // ALLOW USERS TO MANUALLY INPUT SESSION LENGTHS
 
     $("input").on("input", function(evt) {
-        var inputLen = $(this).val().length;
-        console.log(inputLen);
         var inputType = $(this).attr('class');
         if (inputType == 'start-work-display') {
             startWorkMinute = $(this).val();
