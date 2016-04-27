@@ -1,22 +1,51 @@
-//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET
+//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET, TAB BETWEEN INPUTS
+
+//CONCEPTS LEARNED: regex / keydown vs keypress vs keyup / evt.which / .find / setInterval & clearInterval / review : and :: selectors
 
 //TODO: PREVENT INPUTS <1, ONLY ALLOW NUMERICAL INPUTS, SCROLLING START NUMBERS RESULT IN INCORRECT TIME DISPLAY, ALLOW USERS TO SET ALARM LENGTH
 //(NEED TO FIX <1MIN INTERACTIONS WITH MOUSECLICKS / BUG IF SINGLE NON ZERO NUM + (VERY QUICKLY PRESS BACKSP AND ZERO) / 
-//IMPLEMENT FEATURES TO BREAK DISPLAY 
+//IMPLEMENT FEATURES TO BREAK DISPLAY / PRESS ENTER TO START / CLICKING ON BUTTON MAKES THE WINDOW LOSE FOCUS, NEED TO CLICK ON SCREEN TO USE SPACEBAR TO START&PAUSE AGAIN
+//	
+
 
 $(document).ready(function() {
 
+
+
+    // TAB BETWEEN INPUT FIELDS (evt.preventdefault to prevent tabbing past start break minute display)
+
+    $('input').on('keydown', function(evt) {
+        console.log(evt.which);
+        if (evt.which === 32) {
+            evt.preventDefault();
+        }
+        if (evt.which === 9) {
+            console.log('tab pressed');
+            if ($(".start-work-display").is(':focus')) {
+                console.log('breakfocus');
+                $(".start-break-display").focus();
+            } else {
+                $(".start-work-display").focus();
+            }
+            evt.preventDefault();
+        }
+    });
+
+
+
     Init();
+
+    var workTimer;
 
     // Initial work minutes / seconds
 
-    var startWorkMinute;
-    var startWorkSeconds = 0;
+    var startWorkMinute = 20;
+    var startWorkSeconds = 5;
 
     // Initial break minutes / seconds
 
-    var startBreakMinute = 0;
-    var startBreakSeconds = 0;
+    var startBreakMinute = 20;
+    var startBreakSeconds = 5;
 
     // PAUSE
     var isPaused = true;
@@ -25,7 +54,8 @@ $(document).ready(function() {
 
     var alarm = $('#alarm')[0];
 
-    var allowedCodes = /^4[9]|^5[0-7]|^8/g;
+    // 37-40 = arrow keys / 49-57 = [0-9] / 8 = backspace / 9 = tab / 32 = spacebar / 
+    var allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
 
     var inputLen;
 
@@ -35,9 +65,9 @@ $(document).ready(function() {
         afterInputLength();
         // Prevents 0 is display is empty 
         if (inputLen === 0 || inputLen === undefined) {
-            allowedCodes = /^4[9]|^5[0-7]|^8/g;
+            allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
         } else {
-            allowedCodes = /^4[8-9]|^5[0-7]|^8/g;
+            allowedCodes = /^3[7-9]|^40|^4[8-9]|^5[0-7]|^8$|^32$|^9$/g;
         }
     }
 
@@ -53,7 +83,6 @@ $(document).ready(function() {
     function afterInputLength() {
         $("input").keyup(function() {
             inputLen = ($(this).val().length);
-            console.log(inputLen);
         });
     }
 
@@ -128,31 +157,42 @@ $(document).ready(function() {
     // START / PAUSE FUNCTIONS, PAUSECOUNT TO PREVENT BINDING CLICK FUNCTION MORE THAN ONCE (0 = PAUSED, 1 = UNPAUSED)
 
     var pauseCount = 1;
-    $('#pause').click(
-        function() {
-            isPaused = true;
-            if (pauseCount > 1) {
-                bindClick();
-                pauseCount = 0;
-                $("input").attr("disabled", false);
-            }
-        });
 
-    // TRACK IF TIMER IS CURRENTLY RUNNING A SESSION
+    function pause() {
+        isPaused = true;
+        if (pauseCount > 1) {
+            bindClick();
+            pauseCount = 0;
+            $("input").attr("disabled", false);
+        }
+    }
+    $('#pause').click(pause);
+
+    // TRACK IF TIMER IS CURRENTLY RUNNING A SESSION, ALLOWS START BUTTON TO FUNCTION PROPERLY AFTER WORK AND BREAK TIMER NATURALLY TIMES OUT
     var timing = false;
 
-    $('#start').click(
-        function() {
-            if (timing === false) {
-                var workTimer = setInterval(timer, 1000);
-                timing = true;
-            }
-            isPaused = false;
-            unbindClick();
-            // Will always allow bind click on reset or pause click
-            pauseCount += 2;
-            $("input").attr("disabled", true);
-        });
+    function start() {
+        if (timing === false) {
+            workTimer = setInterval(timer, 1000);
+        }
+        isPaused = false;
+        unbindClick();
+        timing = true;
+        // Will always allow bind click on reset or pause click
+        pauseCount += 2;
+        $("input").attr("disabled", true);
+    }
+    $('#start').click(start);
+
+
+    //SPACE BAR TO TOGGLE BETWEEN START AND PAUSE BUTTONS
+    $(window).keyup(function(evt) {
+        if (evt.which === 32 && isPaused === true) {
+            start();
+        } else if (evt.which === 32 && isPaused === false) {
+            pause();
+        }
+    });
 
     // RESET BUTTON 
 
@@ -164,12 +204,16 @@ $(document).ready(function() {
         startBreakMinute = 5;
         startBreakSeconds = 0;
         isPaused = true;
-        timing = false;
+        if (timing === true) {
+            unbindClick();
+            timing = false;
+        }
         //Prevents multiple bind clicks (fix reset->pause, multiple binds)
         if (pauseCount > 1) {
             bindClick();
             pauseCount = 0;
         }
+        clearInterval(workTimer);
         display();
         $("input").attr("disabled", false);
     });
@@ -214,8 +258,8 @@ $(document).ready(function() {
                 }
             } else if (startWorkMinute === 0 && startWorkSeconds === 0) {
                 if (count === 0) {
-                    clearInterval(workTimer);
                     playAlarm();
+                    clearInterval(workTimer);
                 } else {
                     $("#status").text('Break Time!');
                     startWorkSeconds = startBreakSeconds;
