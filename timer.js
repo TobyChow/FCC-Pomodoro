@@ -1,4 +1,4 @@
-//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET, TAB BETWEEN INPUTS
+//FEATURES: USER INPUTS ONLY BETWEEN 1-60, ALARM SOUND, START / PAUSE / RESET, TAB FUNCTIONS ADDED
 
 //CONCEPTS LEARNED: regex / keydown vs keypress vs keyup / evt.which / .find / setInterval & clearInterval / review : and :: selectors
 
