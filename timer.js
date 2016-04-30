@@ -2,7 +2,7 @@
 
 //CONCEPTS LEARNED: regex / keydown vs keypress vs keyup / evt.which / .find / setInterval & clearInterval / review : and :: selectors
 
-//TODO: PREVENT INPUTS <1, ONLY ALLOW NUMERICAL INPUTS, SCROLLING START NUMBERS RESULT IN INCORRECT TIME DISPLAY, ALLOW USERS TO SET ALARM LENGTH
+//TODO: SCROLLING START NUMBERS RESULT IN INCORRECT TIME DISPLAY, ALLOW USERS TO SET ALARM LENGTH
 //(NEED TO FIX <1MIN INTERACTIONS WITH MOUSECLICKS / BUG IF SINGLE NON ZERO NUM + (VERY QUICKLY PRESS BACKSP AND ZERO) / 
 //IMPLEMENT FEATURES TO BREAK DISPLAY / PRESS ENTER TO START / CLICKING ON BUTTON MAKES THE WINDOW LOSE FOCUS, NEED TO CLICK ON SCREEN TO USE SPACEBAR TO START&PAUSE AGAIN
 //	
@@ -10,7 +10,24 @@
 
 $(document).ready(function() {
 
+    var selOverride = false;
 
+    // CHANGE ALLOWED KEY INPUTS BASED ON SELECTION
+    $('input').select(function(evt) {
+        var startIndex = evt.currentTarget.selectionStart;
+        var endIndex = evt.currentTarget.selectionEnd;
+        // if selecting (highlighting) one digit
+        if ((startIndex === 0 && endIndex === 2) || (startIndex === 0 && endIndex === 1)) {
+            allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
+        }
+        selOverride = true;
+        console.log('seperate');
+        console.log($(this).val().length);
+        console.log(evt);
+        console.log(evt.currentTarget.selectionStart);
+        console.log(evt.currentTarget.selectionEnd);
+
+    });
 
     // TAB BETWEEN INPUT FIELDS (evt.preventdefault to prevent tabbing past start break minute display)
 
@@ -55,7 +72,7 @@ $(document).ready(function() {
     var alarm = $('#alarm')[0];
 
     // 37-40 = arrow keys / 49-57 = [0-9] / 8 = backspace / 9 = tab / 32 = spacebar / 
-    var allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
+    allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
 
     var inputLen;
 
@@ -64,9 +81,9 @@ $(document).ready(function() {
     function checkDigit() {
         afterInputLength();
         // Prevents 0 is display is empty 
-        if (inputLen === 0 || inputLen === undefined) {
+        if ((inputLen === 0 || inputLen === undefined) && selOverride === false) {
             allowedCodes = /^3[7-9]|^40|^4[9]|^5[0-7]|^8$|^32$|^9$/g;
-        } else {
+        } else if (selOverride === false) {
             allowedCodes = /^3[7-9]|^40|^4[8-9]|^5[0-7]|^8$|^32$|^9$/g;
         }
     }
@@ -304,6 +321,7 @@ $(document).ready(function() {
             startBreakMinute = $(this).val();
             display();
         }
+        selOverride = false;
     });
 
 });
